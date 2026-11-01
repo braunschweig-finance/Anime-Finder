@@ -94,7 +94,7 @@ async function computeFindAnime(query: string, filters: SearchFilters): Promise<
   if (useAi) {
     try {
       // One entry per franchise, so Gemini's 30 slots go to 30 different shows.
-      const top = onePerFranchise(scored.map((s) => s.a)).slice(0, 30);
+      const top = onePerFranchise(scored.map((s) => s.a), true).slice(0, 30);
       const picks = onePerFranchise(await rankWithGemini(query, top));
       if (picks.length >= 3) return { results: picks, mode: "ai" };
     } catch (err) {
