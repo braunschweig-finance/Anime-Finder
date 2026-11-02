@@ -27,7 +27,7 @@ export function ExampleRow({ label, items, onPick }: { label: string; items: rea
 
 export function SkeletonList({ count = 6 }: { count?: number }) {
   return (
-    <div role="status" aria-live="polite" className="grid grid-cols-1 gap-4">
+    <div role="status" aria-live="polite" className="grid grid-cols-1 gap-4 xl:grid-cols-2">
       <span className="sr-only">Searching…</span>
       {Array.from({ length: count }, (_, i) => (
         <div key={i} className="flex gap-4 rounded-2xl border border-line bg-surface p-3 sm:p-4" aria-hidden="true">

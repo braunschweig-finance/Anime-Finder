@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { SiteHeader } from "@/components/SiteHeader";
 import Link from "next/link";
 
 export const metadata: Metadata = {
@@ -9,6 +10,8 @@ export const metadata: Metadata = {
 
 export default function AboutPage() {
   return (
+    <>
+    <SiteHeader />
     <div className="prose-page mx-auto w-full max-w-3xl px-4 py-10 sm:px-6">
       <h1 className="font-display text-3xl sm:text-4xl">About Anime Finder</h1>
       <p className="mt-4">
@@ -42,5 +45,6 @@ export default function AboutPage() {
         See the <Link href="/privacy">privacy policy</Link> for what happens to your searches.
       </p>
     </div>
+    </>
   );
 }

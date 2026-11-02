@@ -121,7 +121,7 @@ export function ForgotTab() {
         </div>
       </form>
 
-      <div className="mt-6">
+      <div className="mt-5">
         {state.status === "loading" && <SkeletonList count={4} />}
         {state.status === "error" && <ErrorState message={state.message} onRetry={submit} />}
         {state.status === "done" && (

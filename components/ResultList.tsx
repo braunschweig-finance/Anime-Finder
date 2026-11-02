@@ -68,7 +68,7 @@ export function ResultList({ results, numbered = false, sharedLabel }: Props) {
           .
         </p>
       ) : (
-        <ol className="grid grid-cols-1 gap-4" aria-label="Results">
+        <ol className="grid grid-cols-1 gap-4 xl:grid-cols-2" aria-label="Results">
           {visible.map((a, i) => (
             <Fragment key={a.id}>
               <li className="min-w-0">

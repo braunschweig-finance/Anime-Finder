@@ -185,7 +185,7 @@ export function SimilarTab({ initialId, initialTitle = "" }: { initialId?: strin
         )}
       </form>
 
-      <div className="mt-6">
+      <div className="mt-5">
         {state.status === "idle" && (
           <ExampleRow
             label="Popular starting points:"

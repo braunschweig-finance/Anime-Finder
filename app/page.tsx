@@ -7,6 +7,7 @@
  */
 import { Suspense } from "react";
 import { Finder, type FinderInitial } from "@/components/Finder";
+import { Hero } from "@/components/Hero";
 import { SITE_DESCRIPTION, SITE_NAME, SITE_URL } from "@/lib/site";
 
 // Structured data helps Google show the site name and a search box in results.
@@ -46,6 +47,7 @@ export default function Home({ searchParams }: PageProps<"/">) {
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }} />
+      <Hero />
       {/* The fallback is the same page with empty boxes; it's what search engines and first paint see. */}
       <Suspense fallback={<Finder initial={{ tab: "find" }} />}>
         <FinderFromUrl searchParams={searchParams as Promise<Params>} />
