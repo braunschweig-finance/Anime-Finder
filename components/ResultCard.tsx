@@ -14,7 +14,7 @@ import { watchLink } from "@/lib/links";
 import type { AnimeResult } from "@/lib/types";
 
 const CONFIDENCE_STYLE = {
-  High: "bg-sakura text-sakura-ink",
+  High: "bg-accent text-accent-ink",
   Medium: "bg-sky/20 text-sky",
   Low: "bg-surface-2 text-muted",
 } as const;
@@ -124,20 +124,20 @@ export const ResultCard = memo(function ResultCard({ anime, rank, eager = false,
 
       <div className="col-span-2 min-w-0 sm:col-span-1 sm:col-start-2">
         {anime.reason && (
-          <p className="border-l-4 border-sakura pl-3 text-[0.9375rem] leading-relaxed">
+          <p className="border-l-4 border-accent pl-3 text-[0.9375rem] leading-relaxed">
             <span className="sr-only">Why you&apos;ll like it: </span>
             {anime.reason}
           </p>
         )}
         {anime.shared && anime.shared.length > 0 && (
           <p className="text-sm leading-relaxed">
-            <span className="font-bold text-sakura">{sharedLabel}: </span>
+            <span className="font-bold text-accent-text">{sharedLabel}: </span>
             {anime.shared.join(", ")}
           </p>
         )}
         {anime.matchedClues && anime.matchedClues.length > 0 && (
           <p className="mt-1 text-sm leading-relaxed">
-            <span className="font-bold text-sakura">Matches your clues: </span>
+            <span className="font-bold text-accent-text">Matches your clues: </span>
             {anime.matchedClues.join("; ")}
           </p>
         )}
@@ -154,7 +154,7 @@ export const ResultCard = memo(function ResultCard({ anime, rank, eager = false,
               href={link.href}
               target="_blank"
               rel={`noopener noreferrer${link.sponsored ? " sponsored" : ""}`}
-              className="inline-flex min-h-10 items-center rounded-full bg-sakura px-4 text-sm font-bold text-sakura-ink hover:brightness-110"
+              className="inline-flex min-h-10 items-center rounded-full bg-accent px-4 text-sm font-bold text-accent-ink hover:brightness-110"
             >
               Watch on {watch.site}
               <span className="sr-only">: {anime.title}</span>
@@ -174,7 +174,7 @@ export const ResultCard = memo(function ResultCard({ anime, rank, eager = false,
             aria-pressed={seen}
             aria-label={`I've seen it: ${anime.title}`}
             onClick={() => onToggleSeen(anime)}
-            className={`inline-flex min-h-10 items-center gap-1.5 rounded-full px-3 text-sm font-medium hover:bg-surface-2 hover:text-text ${seen ? "text-sakura" : "text-muted"}`}
+            className={`inline-flex min-h-10 items-center gap-1.5 rounded-full px-3 text-sm font-medium hover:bg-surface-2 hover:text-text ${seen ? "text-accent-text" : "text-muted"}`}
           >
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.25" aria-hidden="true">
               {seen ? <path d="M5 12l5 5 9-10" /> : <><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z" /><circle cx="12" cy="12" r="3" /></>}

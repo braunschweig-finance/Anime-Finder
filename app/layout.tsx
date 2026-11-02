@@ -5,6 +5,8 @@ import type { Metadata, Viewport } from "next";
 import { Dela_Gothic_One, Zen_Kaku_Gothic_New } from "next/font/google";
 import Link from "next/link";
 import { preconnect } from "react-dom";
+import { Suspense } from "react";
+import { ArtBackdrop } from "@/components/ArtBackdrop";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { SITE_DESCRIPTION, SITE_NAME, SITE_URL } from "@/lib/site";
 import "./globals.css";
@@ -30,13 +32,13 @@ export const metadata: Metadata = {
 
 export const viewport: Viewport = {
   // Matches the dark page background (dark is the default). ThemeToggle updates it when switching.
-  themeColor: "#14122b",
+  themeColor: "#16141c",
   width: "device-width",
   initialScale: 1,
 };
 
 /** Runs before the page paints: applies the saved light/dark choice (dark by default). */
-const themeScript = `try{var t=localStorage.getItem("theme");if(t==="light"||t==="dark"){document.documentElement.dataset.theme=t;if(t==="light")document.addEventListener("DOMContentLoaded",function(){var m=document.querySelector('meta[name="theme-color"]');if(m)m.content="#f4f3fa"})}}catch(e){}`;
+const themeScript = `try{var t=localStorage.getItem("theme");if(t==="light"||t==="dark"){document.documentElement.dataset.theme=t;if(t==="light")document.addEventListener("DOMContentLoaded",function(){var m=document.querySelector('meta[name="theme-color"]');if(m)m.content="#f3f2f6"})}}catch(e){}`;
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   // Cover art comes from AniList's image server: open that connection early.
@@ -47,12 +49,15 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
       </head>
       <body className="flex min-h-dvh flex-col">
+        <Suspense fallback={null}>
+          <ArtBackdrop />
+        </Suspense>
         <a href="#main" className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded-lg focus:bg-surface focus:px-4 focus:py-2">
           Skip to content
         </a>
-        <header className="mx-auto flex w-full max-w-7xl items-center justify-between px-4 pt-4 sm:px-6">
+        <header className="mx-auto flex w-full max-w-2xl items-center justify-between px-4 pt-4 sm:px-6">
           <Link href="/" className="py-2 font-display text-lg tracking-tight sm:text-xl" translate="no" aria-label={`${SITE_NAME} home`}>
-            Anime<span className="text-sakura">Finder</span>
+            Anime<span className="text-accent-text">Finder</span>
           </Link>
           <nav aria-label="Main" className="flex items-center gap-2 sm:gap-4">
             <Link href="/about" className="px-2 py-2 text-sm font-medium text-muted hover:text-text">
@@ -67,7 +72,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         </main>
 
         <footer className="mt-12 border-t border-line">
-          <div className="mx-auto flex w-full max-w-7xl flex-col gap-3 px-4 py-8 text-sm text-muted sm:flex-row sm:items-center sm:justify-between sm:px-6">
+          <div className="mx-auto flex w-full max-w-2xl flex-col gap-3 px-4 py-8 text-sm text-muted sm:flex-row sm:items-center sm:justify-between sm:px-6">
             <p>
               Anime data from{" "}
               <a href="https://anilist.co" className="text-sky underline underline-offset-4" target="_blank" rel="noopener noreferrer">

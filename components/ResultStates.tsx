@@ -1,7 +1,33 @@
 /** Loading skeletons, notices, empty and error messages shared by all tabs. */
+
+/**
+ * One line of tappable example searches. On narrow screens the row scrolls
+ * sideways (swipe on phones) instead of wrapping onto a second line.
+ */
+export function ExampleRow({ label, items, onPick }: { label: string; items: readonly string[]; onPick: (item: string) => void }) {
+  return (
+    <div>
+      <p className="text-sm text-muted">{label}</p>
+      <ul className="chip-row -mx-4 mt-2 flex gap-2 overflow-x-auto px-4 pb-1 sm:-mx-6 sm:px-6">
+        {items.map((item) => (
+          <li key={item} className="shrink-0">
+            <button
+              type="button"
+              onClick={() => onPick(item)}
+              className="min-h-10 whitespace-nowrap rounded-full border border-line bg-surface px-4 text-sm hover:border-accent"
+            >
+              {item}
+            </button>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
 export function SkeletonList({ count = 6 }: { count?: number }) {
   return (
-    <div role="status" aria-live="polite" className="grid grid-cols-1 gap-5 xl:grid-cols-2">
+    <div role="status" aria-live="polite" className="grid grid-cols-1 gap-4">
       <span className="sr-only">Searching…</span>
       {Array.from({ length: count }, (_, i) => (
         <div key={i} className="flex gap-4 rounded-2xl border border-line bg-surface p-3 sm:p-4" aria-hidden="true">

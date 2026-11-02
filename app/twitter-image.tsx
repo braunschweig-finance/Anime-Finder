@@ -16,18 +16,18 @@ export default function OpengraphImage() {
           flexDirection: "column",
           justifyContent: "center",
           padding: "80px",
-          background: "radial-gradient(900px 400px at 50% 0%, #2c2560, #14122b)",
-          color: "#f1effb",
+          background: "radial-gradient(900px 400px at 50% 0%, #3a2418, #16141c)",
+          color: "#f4f2f7",
           fontFamily: "sans-serif",
         }}
       >
-        <div style={{ fontSize: 34, color: "#ff86b4", fontWeight: 700 }}>Anime Finder</div>
+        <div style={{ fontSize: 34, color: "#ff7a1a", fontWeight: 700 }}>Anime Finder</div>
         <div style={{ fontSize: 76, fontWeight: 800, lineHeight: 1.1, marginTop: 24, display: "flex", flexWrap: "wrap" }}>
           <span>What anime should I watch if I like&nbsp;</span>
-          <span style={{ color: "#ff86b4", borderBottom: "8px solid #ff86b4" }}>Frieren</span>
+          <span style={{ color: "#ff7a1a", borderBottom: "8px solid #ff7a1a" }}>Frieren</span>
           <span>?</span>
         </div>
-        <div style={{ fontSize: 30, color: "#aca8cc", marginTop: 36 }}>
+        <div style={{ fontSize: 30, color: "#a9a5b8", marginTop: 36 }}>
           Describe a vibe, find shows like your favorite, or name that anime you forgot.
         </div>
       </div>

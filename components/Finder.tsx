@@ -5,7 +5,6 @@
  * All three tab panels stay mounted, so switching tabs keeps your results.
  */
 import { useEffect, useRef, useState } from "react";
-import type { FilterValues } from "./Filters";
 import { AD_SLOTS_VISIBLE, AdSlot } from "./AdSlot";
 import { FindTab } from "./FindTab";
 import { ForgotTab } from "./ForgotTab";
@@ -22,7 +21,7 @@ type TabId = (typeof TABS)[number]["id"];
 export interface FinderInitial {
   tab: TabId;
   q?: string;
-  filters?: Partial<Record<keyof FilterValues, string>>;
+  filters?: Record<string, string | undefined>;
   similarId?: string;
   similarTitle?: string;
 }
@@ -78,24 +77,24 @@ export function Finder({ initial }: { initial: FinderInitial }) {
   }
 
   return (
-    <div className="mx-auto w-full max-w-7xl px-4 sm:px-6">
-      <section className="pb-6 pt-6 sm:pb-8 sm:pt-14">
-        <h1 className="max-w-4xl font-display text-[2rem] leading-[1.12] sm:text-5xl lg:text-6xl">
+    <div className={`mx-auto w-full max-w-2xl px-4 sm:px-6 ${AD_SLOTS_VISIBLE ? "lg:max-w-5xl" : ""}`}>
+      <section className="pb-5 pt-6 sm:pb-6 sm:pt-10">
+        <h1 className="font-display text-[1.875rem] leading-[1.12] sm:text-[2.625rem]">
           What anime should I watch if I like{" "}
           <span className="sr-only">___?</span>
           <CyclingBlank />
         </h1>
-        <p className="mt-3 max-w-2xl text-pretty text-[0.9375rem] text-muted sm:mt-4 sm:text-lg">
+        <p className="mt-3 text-pretty text-[0.9375rem] text-muted sm:text-base">
           Describe a vibe, name a show you loved, or list the few details you remember. Every pick is a real show from
           the AniList database.
         </p>
       </section>
 
-      {/* Tabs: three equal panels on phones (no sideways scrolling), natural width on desktop. */}
+      {/* Tabs: three equal columns at every width, so they line up with the search box. */}
       <div
         role="tablist"
         aria-label="Ways to search"
-        className="grid grid-cols-3 gap-1.5 rounded-2xl border border-line bg-surface p-1.5 sm:inline-grid sm:auto-cols-max sm:grid-flow-col sm:grid-cols-none"
+        className="grid grid-cols-3 gap-1.5 rounded-2xl border border-line bg-surface p-1.5"
       >
         {TABS.map((t, i) => (
           <button
@@ -109,9 +108,9 @@ export function Finder({ initial }: { initial: FinderInitial }) {
             tabIndex={tab === t.id ? 0 : -1}
             onClick={() => select(t.id)}
             onKeyDown={(e) => onTabKey(e, i)}
-            className={`min-h-12 rounded-xl px-2 py-1.5 text-[0.8125rem] font-bold leading-tight sm:px-5 sm:text-base ${
+            className={`min-h-12 rounded-xl px-2 py-1.5 text-[0.8125rem] font-bold leading-tight sm:px-3 sm:text-[0.9375rem] ${
               tab === t.id
-                ? "bg-sakura text-sakura-ink"
+                ? "bg-accent text-accent-ink"
                 : "text-muted hover:bg-surface-2 hover:text-text"
             }`}
           >
@@ -120,7 +119,7 @@ export function Finder({ initial }: { initial: FinderInitial }) {
         ))}
       </div>
 
-      <div className="flex gap-8 py-6">
+      <div className="flex gap-8 py-5">
         <div className="min-w-0 flex-1">
           {TABS.map((t) => (
             <section

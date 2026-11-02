@@ -27,7 +27,7 @@ export function ThemeToggle() {
     const next: Theme = theme === "light" ? "dark" : "light";
     document.documentElement.dataset.theme = next;
     // Keep the phone's browser bar the same color as the page.
-    document.querySelector('meta[name="theme-color"]')?.setAttribute("content", next === "light" ? "#f4f3fa" : "#14122b");
+    document.querySelector('meta[name="theme-color"]')?.setAttribute("content", next === "light" ? "#f3f2f6" : "#16141c");
     try {
       localStorage.setItem("theme", next);
     } catch {
