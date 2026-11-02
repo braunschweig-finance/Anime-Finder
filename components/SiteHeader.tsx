@@ -1,6 +1,7 @@
 /** Logo, About link and the light/dark switch. The home page puts it inside the poster hero. */
 import Link from "next/link";
 import { SITE_NAME } from "@/lib/site";
+import { LofiToggle } from "./LofiToggle";
 import { ThemeToggle } from "./ThemeToggle";
 
 export function SiteHeader() {
@@ -13,6 +14,7 @@ export function SiteHeader() {
         <Link href="/about" className="px-2 py-2 text-sm font-medium text-muted hover:text-text">
           About
         </Link>
+        <LofiToggle />
         <ThemeToggle />
       </nav>
     </header>

@@ -76,6 +76,8 @@ export interface SearchResponse {
 
 /** The clue form on the "Forgot the name?" tab. */
 export interface IdentifyClues {
+  /** Everything the visitor remembers, in one free-text box (the current form). */
+  description?: string;
   appearance?: string;
   characterNames?: string;
   plot?: string;

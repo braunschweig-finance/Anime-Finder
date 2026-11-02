@@ -56,8 +56,7 @@ export function Headline() {
         <CyclingBlank />
       </h1>
       <p className="mt-3 max-w-2xl text-pretty text-[0.9375rem] text-muted sm:text-base">
-        Describe a vibe, name a show you loved, or list the few details you remember. Every pick is a real show from
-        the AniList database.
+        Describe a vibe or name a show you loved.
       </p>
     </section>
   );

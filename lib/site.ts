@@ -14,5 +14,5 @@ export const SITE_URL = (
   (process.env.VERCEL_PROJECT_PRODUCTION_URL ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}` : "http://localhost:3000")
 ).replace(/\/$/, "");
 
-/** Shown on the privacy page. Set NEXT_PUBLIC_CONTACT_EMAIL in Vercel (or .env.local). */
-export const CONTACT_EMAIL = process.env.NEXT_PUBLIC_CONTACT_EMAIL || "";
+/** Shown on the privacy page. NEXT_PUBLIC_CONTACT_EMAIL (in Vercel or .env.local) overrides it. */
+export const CONTACT_EMAIL = process.env.NEXT_PUBLIC_CONTACT_EMAIL || "jacob.braunschweig@gmail.com";
