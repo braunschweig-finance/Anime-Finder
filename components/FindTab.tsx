@@ -89,7 +89,7 @@ export function FindTab({
           name="q"
           aria-invalid={formError ? true : undefined}
           aria-describedby={formError ? "find-error" : undefined}
-          rows={3}
+          rows={2}
           maxLength={300}
           autoComplete="off"
           enterKeyHint="search"
@@ -127,7 +127,7 @@ export function FindTab({
 
       <Filters value={filters} onChange={changeFilters} />
 
-      <div ref={resultsRef} className="mt-6 scroll-mt-4">
+      <div ref={resultsRef} className="mt-5 scroll-mt-4">
         {state.status === "idle" && (
           <ExampleRow label="Not sure what to type? Try one:" items={EXAMPLES} onPick={(ex) => { setQuery(ex); search(ex); }} />
         )}

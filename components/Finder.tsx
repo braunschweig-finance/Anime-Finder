@@ -1,10 +1,10 @@
 "use client";
 /**
- * The home page's interactive part: the headline and the three tabs.
+ * The home page's interactive part: the three search tabs (the headline is in Hero.tsx).
  * Tabs follow the WAI-ARIA "tabs" pattern (arrow keys switch tabs).
  * All three tab panels stay mounted, so switching tabs keeps your results.
  */
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { AD_SLOTS_VISIBLE, AdSlot } from "./AdSlot";
 import { FindTab } from "./FindTab";
 import { ForgotTab } from "./ForgotTab";
@@ -24,29 +24,6 @@ export interface FinderInitial {
   filters?: Record<string, string | undefined>;
   similarId?: string;
   similarTitle?: string;
-}
-
-/** Words that cycle through the headline blank. */
-const BLANKS = ["Frieren", "One Piece", "Fire Force", "sad elves", "found family", "giant robots"];
-
-/**
- * The cycling word in the headline. It lives in its own small component so
- * that changing the word every few seconds only re-renders this <span>, not
- * the three search tabs and their results.
- */
-function CyclingBlank() {
-  const [blank, setBlank] = useState(0);
-  // Cycle the word every 2.6s, unless the visitor prefers reduced motion.
-  useEffect(() => {
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    const t = setInterval(() => setBlank((b) => (b + 1) % BLANKS.length), 2600);
-    return () => clearInterval(t);
-  }, []);
-  return (
-    <span aria-hidden="true">
-      <span key={blank} className="blank">{BLANKS[blank]}</span>?
-    </span>
-  );
 }
 
 export function Finder({ initial }: { initial: FinderInitial }) {
@@ -77,24 +54,12 @@ export function Finder({ initial }: { initial: FinderInitial }) {
   }
 
   return (
-    <div className={`mx-auto w-full max-w-2xl px-4 sm:px-6 ${AD_SLOTS_VISIBLE ? "lg:max-w-5xl" : ""}`}>
-      <section className="pb-5 pt-6 sm:pb-6 sm:pt-10">
-        <h1 className="font-display text-[1.875rem] leading-[1.12] sm:text-[2.625rem]">
-          What anime should I watch if I like{" "}
-          <span className="sr-only">___?</span>
-          <CyclingBlank />
-        </h1>
-        <p className="mt-3 text-pretty text-[0.9375rem] text-muted sm:text-base">
-          Describe a vibe, name a show you loved, or list the few details you remember. Every pick is a real show from
-          the AniList database.
-        </p>
-      </section>
-
-      {/* Tabs: three equal columns at every width, so they line up with the search box. */}
+    <div className="mx-auto w-full max-w-7xl px-4 pt-4 sm:px-6 sm:pt-5">
+      {/* Tabs: three equal panels on phones (no sideways scrolling), natural width on desktop. */}
       <div
         role="tablist"
         aria-label="Ways to search"
-        className="grid grid-cols-3 gap-1.5 rounded-2xl border border-line bg-surface p-1.5"
+        className="grid grid-cols-3 gap-1.5 rounded-2xl border border-line bg-surface p-1.5 sm:inline-grid sm:auto-cols-max sm:grid-flow-col sm:grid-cols-none"
       >
         {TABS.map((t, i) => (
           <button
@@ -108,7 +73,7 @@ export function Finder({ initial }: { initial: FinderInitial }) {
             tabIndex={tab === t.id ? 0 : -1}
             onClick={() => select(t.id)}
             onKeyDown={(e) => onTabKey(e, i)}
-            className={`min-h-12 rounded-xl px-2 py-1.5 text-[0.8125rem] font-bold leading-tight sm:px-3 sm:text-[0.9375rem] ${
+            className={`min-h-12 rounded-xl px-2 py-1.5 text-[0.8125rem] font-bold leading-tight sm:px-5 sm:text-base ${
               tab === t.id
                 ? "bg-accent text-accent-ink"
                 : "text-muted hover:bg-surface-2 hover:text-text"
@@ -119,7 +84,7 @@ export function Finder({ initial }: { initial: FinderInitial }) {
         ))}
       </div>
 
-      <div className="flex gap-8 py-5">
+      <div className="flex gap-8 pt-4">
         <div className="min-w-0 flex-1">
           {TABS.map((t) => (
             <section

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { SiteHeader } from "@/components/SiteHeader";
 import { CONTACT_EMAIL } from "@/lib/site";
 
 export const metadata: Metadata = {
@@ -12,6 +13,8 @@ const UPDATED = "November 1, 2026";
 
 export default function PrivacyPage() {
   return (
+    <>
+    <SiteHeader />
     <div className="prose-page mx-auto w-full max-w-3xl px-4 py-10 sm:px-6">
       <h1 className="font-display text-3xl sm:text-4xl">Privacy policy</h1>
       <p className="mt-2 text-sm">Last updated {UPDATED}</p>
@@ -71,5 +74,6 @@ export default function PrivacyPage() {
         )}
       </p>
     </div>
+    </>
   );
 }

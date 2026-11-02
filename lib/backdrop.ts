@@ -1,5 +1,5 @@
 /**
- * Cover art for the poster wall behind every page (see components/ArtBackdrop.tsx).
+ * Cover art for the sliding poster strip behind the home page headline (components/Hero.tsx).
  *
  * "use cache" means Next.js fetches this once at build time and then refreshes
  * it at most once a day, so visitors never wait on AniList for the background.
@@ -13,21 +13,21 @@ query ($perPage: Int) {
     media(type: ANIME, sort: [TRENDING_DESC, POPULARITY_DESC], isAdult: false, format_in: [TV, MOVIE]) {
       id
       title { romaji }
-      coverImage { medium }
+      coverImage { large }
     }
   }
 }`;
 
 interface Raw {
-  Page?: { media?: { id: number; coverImage?: { medium?: string | null } | null }[] };
+  Page?: { media?: { id: number; coverImage?: { large?: string | null } | null }[] };
 }
 
 export async function getBackdropCovers(): Promise<string[]> {
   "use cache";
   try {
-    const data = await anilistQuery<Raw>(QUERY, { perPage: 24 });
+    const data = await anilistQuery<Raw>(QUERY, { perPage: 14 });
     const covers = (data.Page?.media ?? [])
-      .map((m) => m.coverImage?.medium)
+      .map((m) => m.coverImage?.large)
       .filter((u): u is string => Boolean(u));
     cacheLife("days");
     return covers;

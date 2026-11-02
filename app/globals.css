@@ -26,7 +26,6 @@
   --sky: #7dd9ff;
   --gold: #ffd23f;
   --danger: #ff9a8a;
-  --art-opacity: 0.5;
   color-scheme: dark;
 }
 
@@ -46,7 +45,6 @@
   --sky: #1b64a5;
   --gold: #8a5d00;
   --danger: #b3261e;
-  --art-opacity: 0.4;
   color-scheme: light;
 }
 
@@ -69,16 +67,13 @@
 }
 
 html {
-  background:
-    radial-gradient(1200px 500px at 50% -200px, var(--bg-glow), transparent 70%),
-    var(--bg);
+  background: var(--bg);
   -webkit-tap-highlight-color: transparent;
 }
 
 /* Buttons and links respond instantly to taps on phones (no double-tap zoom delay). */
 a, button, input, select, textarea, label { touch-action: manipulation; }
 
-/* The page background lives on <html> so the poster wall (z-index -1) shows through <body>. */
 body {
   color: var(--text);
   font-family: var(--font-sans);
@@ -86,53 +81,51 @@ body {
 }
 
 /*
- * Poster wall behind every page (components/ArtBackdrop.tsx). A fixed layer
- * with a tilted grid of covers and a veil on top: strongest at the top of the
- * screen, fading to the plain background where results are read.
- * Nothing here moves, so it costs one paint, not a frame budget.
+ * Home page hero (components/Hero.tsx): a strip of trending covers slides
+ * slowly sideways behind the headline, under a veil that keeps the text
+ * readable. Only transform animates, so it stays smooth on phones.
  */
-.art-backdrop {
-  position: fixed;
+.hero {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  background: var(--bg);
+}
+.hero-strip {
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+}
+.hero-track {
+  display: flex;
+  gap: 10px;
+  height: 100%;
+  width: max-content;
+  animation: hero-slide 90s linear infinite;
+}
+.hero-track img {
+  height: 100%;
+  width: auto;
+  aspect-ratio: 23 / 33;
+  object-fit: cover;
+}
+@keyframes hero-slide {
+  from { transform: translateX(0); }
+  to { transform: translateX(calc(-50% - 5px)); } /* half the strip plus half a gap: a seamless loop */
+}
+.hero-veil {
+  position: absolute;
   inset: 0;
   z-index: -1;
-  overflow: hidden;
-  pointer-events: none;
-}
-.art-wall {
-  position: absolute;
-  inset: -25% -30%;
-  display: grid;
-  grid-template-columns: repeat(auto-fill, 84px);
-  grid-auto-rows: 119px;
-  gap: 10px;
-  justify-content: center;
-  transform: rotate(-9deg);
-  opacity: var(--art-opacity);
-}
-.art-wall img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  border-radius: 8px;
-}
-@media (min-width: 640px) {
-  .art-wall { grid-template-columns: repeat(auto-fill, 112px); grid-auto-rows: 159px; gap: 14px; }
-}
-.art-veil {
-  position: absolute;
-  inset: 0;
   background:
-    linear-gradient(to bottom,
-      color-mix(in oklab, var(--bg) 55%, transparent) 0%,
-      color-mix(in oklab, var(--bg) 80%, transparent) 45%,
-      var(--bg) 100%);
+    linear-gradient(to bottom, rgb(22 20 28 / 0.55) 0%, rgb(22 20 28 / 0.8) 100%);
 }
 @media (min-width: 768px) {
-  /* On wide screens the art frames the narrow content column from both sides. */
-  .art-veil {
+  /* Text on the left, art showing through more on the right. */
+  .hero-veil {
     background:
-      linear-gradient(to right, transparent 0%, color-mix(in oklab, var(--bg) 70%, transparent) 30%, color-mix(in oklab, var(--bg) 70%, transparent) 70%, transparent 100%),
-      linear-gradient(to bottom, color-mix(in oklab, var(--bg) 45%, transparent) 0%, color-mix(in oklab, var(--bg) 85%, transparent) 100%);
+      linear-gradient(to bottom, rgb(22 20 28 / 0.6) 0%, transparent 30%),
+      linear-gradient(to right, rgb(22 20 28 / 0.92) 0%, rgb(22 20 28 / 0.8) 50%, rgb(22 20 28 / 0.5) 100%);
   }
 }
 
@@ -228,7 +221,7 @@ body {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .blank, .skeleton { animation: none; }
+  .blank, .skeleton, .hero-track { animation: none; }
 }
 
 /* Headings never leave a single word dangling on its own line. */
