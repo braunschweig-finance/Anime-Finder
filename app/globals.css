@@ -5,43 +5,48 @@
  * Components use these through Tailwind classes like bg-surface or text-muted,
  * so changing a color here changes it everywhere.
  *
- * Palette: "late-night anime blue" with sakura pink for actions, sky blue for
- * links/focus, and a warm gold reserved for scores.
+ * Palette: dusk charcoal with a hot "simulcast orange" for actions, sky blue
+ * for links/focus, and a warm gold reserved for scores. --accent is the fill
+ * (buttons, bars); --accent-text is the same orange tuned to pass 4.5:1 as text.
  */
 :root,
 [data-theme="dark"] {
-  --bg: #14122b;
-  --bg-glow: #221d4a;
-  --surface: #1e1b3d;
-  --surface-2: #2a2652;
-  --line: #3a3570;
-  --ink: #0a0818; /* the hard "manga ink" shadow under the search panel */
-  --tone: rgb(255 134 180 / 0.22); /* halftone dots */
-  --text: #f1effb;
-  --muted: #aca8cc;
-  --sakura: #ff86b4;
-  --sakura-ink: #2a0d1a; /* text on top of sakura buttons */
+  --bg: #16141c;
+  --bg-glow: #2a1d1a;
+  --surface: #211e29;
+  --surface-2: #2c2836;
+  --line: #3d3949;
+  --ink: #09080c; /* the hard "manga ink" shadow under the search panel */
+  --tone: rgb(255 122 26 / 0.22); /* halftone dots */
+  --text: #f4f2f7;
+  --muted: #a9a5b8;
+  --accent: #ff7a1a;
+  --accent-ink: #1c0a00; /* text on top of orange buttons */
+  --accent-text: #ff9a4d;
   --sky: #7dd9ff;
   --gold: #ffd23f;
   --danger: #ff9a8a;
+  --art-opacity: 0.5;
   color-scheme: dark;
 }
 
 [data-theme="light"] {
-  --bg: #f4f3fa;
-  --bg-glow: #e6e1fa;
+  --bg: #f3f2f6;
+  --bg-glow: #ffe6d3;
   --surface: #ffffff;
-  --surface-2: #eeebf8;
-  --line: #d6d0ec;
-  --ink: #17152e;
-  --tone: rgb(196 36 95 / 0.16);
-  --text: #17152e;
-  --muted: #545073;
-  --sakura: #c4245f;
-  --sakura-ink: #ffffff;
+  --surface-2: #eceaf1;
+  --line: #d9d6e2;
+  --ink: #16141c;
+  --tone: rgb(242 106 16 / 0.18);
+  --text: #16141c;
+  --muted: #56526a;
+  --accent: #f26a10;
+  --accent-ink: #1c0a00;
+  --accent-text: #a84200;
   --sky: #1b64a5;
   --gold: #8a5d00;
   --danger: #b3261e;
+  --art-opacity: 0.4;
   color-scheme: light;
 }
 
@@ -52,8 +57,9 @@
   --color-line: var(--line);
   --color-text: var(--text);
   --color-muted: var(--muted);
-  --color-sakura: var(--sakura);
-  --color-sakura-ink: var(--sakura-ink);
+  --color-accent: var(--accent);
+  --color-accent-ink: var(--accent-ink);
+  --color-accent-text: var(--accent-text);
   --color-sky: var(--sky);
   --color-gold: var(--gold);
   --color-danger: var(--danger);
@@ -63,20 +69,89 @@
 }
 
 html {
-  background: var(--bg);
+  background:
+    radial-gradient(1200px 500px at 50% -200px, var(--bg-glow), transparent 70%),
+    var(--bg);
   -webkit-tap-highlight-color: transparent;
 }
 
 /* Buttons and links respond instantly to taps on phones (no double-tap zoom delay). */
 a, button, input, select, textarea, label { touch-action: manipulation; }
 
+/* The page background lives on <html> so the poster wall (z-index -1) shows through <body>. */
 body {
-  background:
-    radial-gradient(1200px 500px at 50% -200px, var(--bg-glow), transparent 70%),
-    var(--bg);
   color: var(--text);
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
+}
+
+/*
+ * Poster wall behind every page (components/ArtBackdrop.tsx). A fixed layer
+ * with a tilted grid of covers and a veil on top: strongest at the top of the
+ * screen, fading to the plain background where results are read.
+ * Nothing here moves, so it costs one paint, not a frame budget.
+ */
+.art-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+}
+.art-wall {
+  position: absolute;
+  inset: -25% -30%;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, 84px);
+  grid-auto-rows: 119px;
+  gap: 10px;
+  justify-content: center;
+  transform: rotate(-9deg);
+  opacity: var(--art-opacity);
+}
+.art-wall img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 8px;
+}
+@media (min-width: 640px) {
+  .art-wall { grid-template-columns: repeat(auto-fill, 112px); grid-auto-rows: 159px; gap: 14px; }
+}
+.art-veil {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(to bottom,
+      color-mix(in oklab, var(--bg) 55%, transparent) 0%,
+      color-mix(in oklab, var(--bg) 80%, transparent) 45%,
+      var(--bg) 100%);
+}
+@media (min-width: 768px) {
+  /* On wide screens the art frames the narrow content column from both sides. */
+  .art-veil {
+    background:
+      linear-gradient(to right, transparent 0%, color-mix(in oklab, var(--bg) 70%, transparent) 30%, color-mix(in oklab, var(--bg) 70%, transparent) 70%, transparent 100%),
+      linear-gradient(to bottom, color-mix(in oklab, var(--bg) 45%, transparent) 0%, color-mix(in oklab, var(--bg) 85%, transparent) 100%);
+  }
+}
+
+/* Example chips: one swipeable line, edges fade out to hint there's more. */
+.chip-row {
+  scrollbar-width: none;
+  overscroll-behavior-x: contain;
+  -webkit-mask-image: linear-gradient(to right, transparent 0, #000 1rem, #000 calc(100% - 2rem), transparent 100%);
+  mask-image: linear-gradient(to right, transparent 0, #000 1rem, #000 calc(100% - 2rem), transparent 100%);
+}
+.chip-row::-webkit-scrollbar { display: none; }
+
+/* Filter dropdowns: our own small chevron so phones keep room for the text. */
+.select-chevron {
+  appearance: none;
+  background-image: linear-gradient(45deg, transparent 50%, var(--muted) 50%), linear-gradient(135deg, var(--muted) 50%, transparent 50%);
+  background-position: calc(100% - 15px) 50%, calc(100% - 10px) 50%;
+  background-size: 5px 5px;
+  background-repeat: no-repeat;
 }
 
 /* Visible keyboard focus everywhere (mouse clicks don't show it). */
@@ -90,8 +165,8 @@ body {
 .blank {
   display: inline-block;
   min-width: 4ch;
-  border-bottom: 0.12em solid var(--sakura);
-  color: var(--sakura);
+  border-bottom: 0.12em solid var(--accent);
+  color: var(--accent-text);
   animation: blank-in 450ms ease-out;
 }
 @keyframes blank-in {
@@ -109,7 +184,7 @@ body {
   border: 2px solid var(--text);
   border-radius: 1.25rem;
   background: var(--surface);
-  box-shadow: 6px 6px 0 var(--sakura);
+  box-shadow: 6px 6px 0 var(--accent);
 }
 .panel::before {
   content: "";
@@ -139,7 +214,7 @@ body {
   color: var(--bg);
   -webkit-text-stroke: 1.5px var(--text);
   paint-order: stroke fill;
-  text-shadow: 3px 3px 0 var(--sakura);
+  text-shadow: 3px 3px 0 var(--accent);
 }
 
 /* Loading skeleton shimmer. */

@@ -35,10 +35,7 @@ async function FinderFromUrl({ searchParams }: { searchParams: Promise<Params> }
   const initial: FinderInitial = {
     tab: one("tab") === "similar" ? "similar" : one("tab") === "forgot" ? "forgot" : "find",
     q: one("q").slice(0, 300),
-    filters: {
-      genre: one("genre"), format: one("format"), status: one("status"), epMin: one("epMin"), epMax: one("epMax"),
-      minScore: one("minScore"), yearFrom: one("yearFrom"), yearTo: one("yearTo"),
-    },
+    filters: { genre: one("genre"), format: one("format"), epMin: one("epMin"), epMax: one("epMax") },
     similarId: one("id"),
     similarTitle: one("title").slice(0, 80),
   };

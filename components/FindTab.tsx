@@ -1,37 +1,21 @@
 "use client";
 /** TAB 1 — describe what you want in plain English, get real picks with reasons. */
 import { useEffect, useRef, useState } from "react";
-import { EMPTY_FILTERS, Filters, type FilterValues } from "./Filters";
+import { Filters, filterParams, filtersFromParams, type FilterValues } from "./Filters";
 import { ResultList } from "./ResultList";
-import { EmptyState, ErrorState, Notice, SkeletonList } from "./ResultStates";
+import { EmptyState, ErrorState, ExampleRow, Notice, SkeletonList } from "./ResultStates";
 import { useRequest } from "./useRequest";
 
 const EXAMPLES = [
-  "a sad fantasy about an elf who outlives her friends",
-  "a hype battle anime with a found-family crew",
-  "anime like Fire Force but already finished",
-  "a cozy slice of life to fall asleep to",
-  "a mind-game thriller with a genius villain",
+  "a sad fantasy about an immortal elf",
+  "hype battles with a found family",
+  "like Fire Force but finished",
+  "cozy slice of life",
+  "a genius-villain mind game",
 ];
 
-const FILTER_KEYS = Object.keys(EMPTY_FILTERS) as (keyof FilterValues)[];
-
 function buildUrl(q: string, f: FilterValues) {
-  const p = new URLSearchParams({ q });
-  for (const k of FILTER_KEYS) if (f[k]) p.set(k, f[k]);
-  return p;
-}
-
-/** Turn untrusted URL values into valid filter values (unknown ones become empty). */
-function cleanFilters(raw: Partial<Record<keyof FilterValues, string>> = {}): FilterValues {
-  const num = (v?: string) => (v && /^\d{1,4}$/.test(v) ? v : "");
-  return {
-    genre: raw.genre ?? "",
-    format: raw.format === "TV" || raw.format === "MOVIE" ? raw.format : "",
-    status: raw.status === "FINISHED" || raw.status === "RELEASING" ? raw.status : "",
-    epMin: num(raw.epMin), epMax: num(raw.epMax), minScore: num(raw.minScore),
-    yearFrom: num(raw.yearFrom), yearTo: num(raw.yearTo),
-  };
+  return new URLSearchParams({ q, ...filterParams(f) });
 }
 
 export function FindTab({
@@ -39,10 +23,10 @@ export function FindTab({
   initialFilters,
 }: {
   initialQuery?: string;
-  initialFilters?: Partial<Record<keyof FilterValues, string>>;
+  initialFilters?: Record<string, string | undefined>;
 }) {
   const [query, setQuery] = useState(initialQuery);
-  const [filters, setFilters] = useState<FilterValues>(() => cleanFilters(initialFilters));
+  const [filters, setFilters] = useState<FilterValues>(() => filtersFromParams(initialFilters));
   const [lastQuery, setLastQuery] = useState(initialQuery.trim());
   const { state, run } = useRequest();
   const resultsRef = useRef<HTMLDivElement>(null);
@@ -76,9 +60,9 @@ export function FindTab({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // When filters change after a search, re-run it after a short pause, so typing
-  // a year like 2015 doesn't fire four searches. This runs from the change event
-  // itself rather than from an effect watching `filters`.
+  // When filters change after a search, re-run it after a short pause, so flicking
+  // through a few options doesn't fire a search for each. This runs from the
+  // change event itself rather than from an effect watching `filters`.
   const filterTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
   function changeFilters(next: FilterValues) {
     setFilters(next);
@@ -134,7 +118,7 @@ export function FindTab({
             type="submit"
             disabled={state.status === "loading"}
             aria-busy={state.status === "loading"}
-            className="min-h-12 rounded-xl bg-sakura px-6 text-base font-bold text-sakura-ink hover:brightness-110 active:translate-y-px disabled:cursor-progress disabled:opacity-70"
+            className="min-h-12 rounded-xl bg-accent px-6 text-base font-bold text-accent-ink hover:brightness-110 active:translate-y-px disabled:cursor-progress disabled:opacity-70"
           >
             {state.status === "loading" ? "Searching…" : "Find anime"}
           </button>
@@ -145,25 +129,7 @@ export function FindTab({
 
       <div ref={resultsRef} className="mt-6 scroll-mt-4">
         {state.status === "idle" && (
-          <div>
-            <p className="text-sm text-muted">Not sure what to type? Try one of these:</p>
-            <ul className="mt-3 flex flex-wrap gap-2">
-              {EXAMPLES.map((ex) => (
-                <li key={ex}>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setQuery(ex);
-                      search(ex);
-                    }}
-                    className="min-h-10 rounded-full border border-line bg-surface px-4 py-2 text-left text-sm hover:border-sakura"
-                  >
-                    {ex}
-                  </button>
-                </li>
-              ))}
-            </ul>
-          </div>
+          <ExampleRow label="Not sure what to type? Try one:" items={EXAMPLES} onPick={(ex) => { setQuery(ex); search(ex); }} />
         )}
         {state.status === "loading" && <SkeletonList />}
         {state.status === "error" && <ErrorState message={state.message} onRetry={() => search(lastQuery)} />}

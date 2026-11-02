@@ -109,7 +109,7 @@ export function ForgotTab() {
             type="submit"
             disabled={state.status === "loading"}
             aria-busy={state.status === "loading"}
-            className="min-h-12 rounded-xl bg-sakura px-6 text-base font-bold text-sakura-ink hover:brightness-110 active:translate-y-px disabled:cursor-progress disabled:opacity-70"
+            className="min-h-12 rounded-xl bg-accent px-6 text-base font-bold text-accent-ink hover:brightness-110 active:translate-y-px disabled:cursor-progress disabled:opacity-70"
           >
             {state.status === "loading" ? "Searching…" : "Find the show"}
           </button>

@@ -10,7 +10,7 @@ import { useEffect, useId, useRef, useState } from "react";
 import { FORMAT_LABEL } from "@/lib/format";
 import type { Suggestion } from "@/lib/anilist";
 import { ResultList } from "./ResultList";
-import { EmptyState, ErrorState, SkeletonList } from "./ResultStates";
+import { EmptyState, ErrorState, ExampleRow, SkeletonList } from "./ResultStates";
 import { useRequest } from "./useRequest";
 
 const QUICK_PICKS = ["Frieren", "One Piece", "Fire Force", "Jujutsu Kaisen", "Attack on Titan"];
@@ -173,7 +173,7 @@ export function SimilarTab({ initialId, initialTitle = "" }: { initialId?: strin
             type="submit"
             disabled={state.status === "loading"}
             aria-busy={state.status === "loading"}
-            className="min-h-12 shrink-0 rounded-xl bg-sakura px-6 text-base font-bold text-sakura-ink hover:brightness-110 active:translate-y-px disabled:cursor-progress disabled:opacity-70"
+            className="min-h-12 shrink-0 rounded-xl bg-accent px-6 text-base font-bold text-accent-ink hover:brightness-110 active:translate-y-px disabled:cursor-progress disabled:opacity-70"
           >
             {state.status === "loading" ? "Finding…" : "Show similar"}
           </button>
@@ -187,22 +187,11 @@ export function SimilarTab({ initialId, initialTitle = "" }: { initialId?: strin
 
       <div className="mt-6">
         {state.status === "idle" && (
-          <div>
-            <p className="text-sm text-muted">Popular starting points:</p>
-            <ul className="mt-3 flex flex-wrap gap-2">
-              {QUICK_PICKS.map((t) => (
-                <li key={t}>
-                  <button
-                    type="button"
-                    onClick={() => { setTextQuietly(t); lookup(`title=${encodeURIComponent(t)}`); }}
-                    className="min-h-10 rounded-full border border-line bg-surface px-4 py-2 text-sm hover:border-sakura"
-                  >
-                    {t}
-                  </button>
-                </li>
-              ))}
-            </ul>
-          </div>
+          <ExampleRow
+            label="Popular starting points:"
+            items={QUICK_PICKS}
+            onPick={(t) => { setTextQuietly(t); lookup(`title=${encodeURIComponent(t)}`); }}
+          />
         )}
         {state.status === "loading" && <SkeletonList />}
         {state.status === "error" && <ErrorState message={state.message} onRetry={() => lastParams.current && lookup(lastParams.current)} />}
