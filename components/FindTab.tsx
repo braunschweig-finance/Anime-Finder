@@ -3,16 +3,9 @@
 import { useEffect, useRef, useState } from "react";
 import { Filters, filterParams, filtersFromParams, type FilterValues } from "./Filters";
 import { ResultList } from "./ResultList";
-import { EmptyState, ErrorState, ExampleRow, Notice, SkeletonList } from "./ResultStates";
+import { EmptyState, ErrorState, Notice, SkeletonList } from "./ResultStates";
 import { useRequest } from "./useRequest";
 
-const EXAMPLES = [
-  "a sad fantasy about an immortal elf",
-  "hype battles with a found family",
-  "like Fire Force but finished",
-  "cozy slice of life",
-  "a genius-villain mind game",
-];
 
 function buildUrl(q: string, f: FilterValues) {
   return new URLSearchParams({ q, ...filterParams(f) });
@@ -128,9 +121,6 @@ export function FindTab({
       <Filters value={filters} onChange={changeFilters} />
 
       <div ref={resultsRef} className="mt-5 scroll-mt-4">
-        {state.status === "idle" && (
-          <ExampleRow label="Not sure what to type? Try one:" items={EXAMPLES} onPick={(ex) => { setQuery(ex); search(ex); }} />
-        )}
         {state.status === "loading" && <SkeletonList />}
         {state.status === "error" && <ErrorState message={state.message} onRetry={() => search(lastQuery)} />}
         {state.status === "done" && (

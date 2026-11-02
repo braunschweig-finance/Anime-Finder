@@ -119,7 +119,6 @@ export function SimilarTab({ initialId, initialTitle = "" }: { initialId?: strin
               enterKeyHint="search"
               maxLength={80}
               value={text}
-              placeholder="Frieren, One Piece, Fire Force…"
               onChange={(e) => { setText(e.target.value); if (formError) setFormError(""); }}
               onFocus={() => suggestions.length && setOpen(true)}
               onBlur={() => setTimeout(() => setOpen(false), 150)}

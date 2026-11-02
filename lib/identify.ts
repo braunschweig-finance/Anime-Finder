@@ -23,6 +23,7 @@ const cache = new TTLCache<SearchResponse>(300, 6 * 60 * 60 * 1000);
 type Confidence = NonNullable<AnimeResult["confidence"]>;
 
 const CLUE_LABELS: Record<keyof IdentifyClues, string> = {
+  description: "What I remember",
   appearance: "Character looks",
   characterNames: "Character names",
   plot: "Plot events",
@@ -38,10 +39,12 @@ export async function identifyAnime(clues: IdentifyClues): Promise<SearchRespons
   const hit = cache.get(key);
   if (hit) return hit;
 
-  const names = (clues.characterNames ?? "").split(/[,;\n]| and /i).map((s) => s.trim()).filter((s) => s.length >= 2);
+  const names = clues.characterNames
+    ? clues.characterNames.split(/[,;\n]| and /i).map((s) => s.trim()).filter((s) => s.length >= 2)
+    : likelyNames(clues.description);
   // Character lookups don't need Gemini, so start them right away.
   const charPromise = searchCharacters(names).catch(() => ({}) as Record<string, CharacterHit[]>);
-  const watchedBy = latestYear(clues.whenWatched);
+  const watchedBy = latestYear(clues.whenWatched ?? watchedYearIn(clues.description));
 
   let res: SearchResponse;
   try {
@@ -59,6 +62,38 @@ export async function identifyAnime(clues: IdentifyClues): Promise<SearchRespons
     cache.set(key, res, 60 * 1000); // keep fallback answers only a minute, so a retry can reach Gemini
   }
   return res;
+}
+
+/* ------------------------------------------------------------------ */
+/* Reading the single free-text box                                    */
+/* ------------------------------------------------------------------ */
+
+/** Capitalized words that are rarely character names. */
+const NOT_NAMES = new Set(
+  ("I The A An He She They It His Her Their There This That These Those When Where What Who Why How And But Or So " +
+    "Then Also Some One Two Anime Show Series Movie Season Episode Japan Japanese Tokyo Kyoto Osaka Earth Mars " +
+    "School High Academy Demon Demons God Gods King Queen Prince Princess Lord Lady Mr Mrs Ms Dr Netflix Crunchyroll " +
+    "English Monday Tuesday Wednesday Thursday Friday Saturday Sunday January February March April May June July " +
+    "August September October November December").split(" "),
+);
+
+/**
+ * Guess character names in a free-text description: capitalized words that
+ * don't start a sentence, e.g. "the guy named Shinra" → ["Shinra"]. They are
+ * looked up as AniList characters, which only ever adds or confirms a match.
+ */
+export function likelyNames(text?: string): string[] {
+  if (!text) return [];
+  const out = new Set<string>();
+  for (const m of text.matchAll(/(?<![.!?]\s|^)\b([A-Z][a-z]{2,})\b/g)) {
+    if (!NOT_NAMES.has(m[1])) out.add(m[1]);
+  }
+  return [...out].slice(0, 3);
+}
+
+/** A year next to "watched"/"saw", e.g. "I watched it around 2012" → "2012". */
+function watchedYearIn(text?: string): string | undefined {
+  return text?.match(/\b(?:watched|saw|seen)\b[^.]{0,30}?\b((?:19|20)\d\d)\b/i)?.[1];
 }
 
 /* ------------------------------------------------------------------ */
@@ -156,7 +191,7 @@ async function identifyBasic(
   watchedBy: number | null,
 ): Promise<SearchResponse> {
   // Plot/setting/style words → AniList tags.
-  const text = [clues.plot, clues.setting, clues.timePeriod, clues.artStyle, clues.other, clues.appearance]
+  const text = [clues.description, clues.plot, clues.setting, clues.timePeriod, clues.artStyle, clues.other, clues.appearance]
     .filter(Boolean)
     .join(". ");
   const vocab = await getVocabulary();

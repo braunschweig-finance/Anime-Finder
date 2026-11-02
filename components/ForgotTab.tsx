@@ -1,110 +1,75 @@
 "use client";
-/** TAB 3 — "Forgot the name?": fill in whatever you remember, get likely shows with a confidence label. */
-import { useState } from "react";
-import type { IdentifyClues } from "@/lib/types";
+/** TAB 3 — "Forgot the name?": describe whatever you remember in one box, get likely shows with a confidence label. */
+import { useRef, useState } from "react";
 import { ResultList } from "./ResultList";
 import { EmptyState, ErrorState, Notice, SkeletonList } from "./ResultStates";
 import { useRequest } from "./useRequest";
 
-type Field = { key: keyof IdentifyClues; label: string; placeholder: string; long?: boolean; extra?: boolean };
-
-const FIELDS: Field[] = [
-  { key: "appearance", label: "What a character looked like", placeholder: "Girl with pink hair and a big sword…" },
-  { key: "characterNames", label: "Any character names", placeholder: "Shinra, or just part of a name…" },
-  { key: "plot", label: "Things that happened", placeholder: "She fights demons to save her brother…", long: true },
-  { key: "other", label: "Anything else", placeholder: "Opening song, a scene, a quote, how it ended…", long: true },
-  { key: "setting", label: "Where it takes place", placeholder: "Tokyo, a magic school, space, another world…", extra: true },
-  { key: "timePeriod", label: "Time period in the story", placeholder: "Feudal Japan, modern day, the future…", extra: true },
-  { key: "artStyle", label: "Art style", placeholder: "Old 90s look, very colorful, dark and gritty…", extra: true },
-  { key: "whenWatched", label: "Roughly when you watched it", placeholder: "Around 2012…", extra: true },
-];
-
-const EMPTY: IdentifyClues = {};
-const inputClass =
-  "mt-1 block w-full rounded-xl border border-line bg-bg px-3 py-2.5 text-base font-normal text-text placeholder:text-muted focus:border-sky focus:outline-none focus-visible:ring-2 focus-visible:ring-sky/60";
-
 export function ForgotTab() {
-  const [clues, setClues] = useState<IdentifyClues>(EMPTY);
+  const [text, setText] = useState("");
   const { state, run } = useRequest();
-  const filled = Object.values(clues).filter((v) => v?.trim()).length;
-
   const [formError, setFormError] = useState("");
-  // The less common questions stay folded away until asked for, so the form fits on a phone screen.
-  const [showExtra, setShowExtra] = useState(false);
+  const inputRef = useRef<HTMLTextAreaElement>(null);
 
   function submit() {
-    if (filled === 0) {
-      setFormError("Fill in at least one detail, like a character's look or something that happened.");
-      document.querySelector<HTMLInputElement>('[name="appearance"]')?.focus();
+    const description = text.trim();
+    if (description.length < 3) {
+      setFormError("Describe anything you remember, like a character's look or something that happened.");
+      inputRef.current?.focus();
       return;
     }
     setFormError("");
     void run("/api/identify", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(clues),
+      body: JSON.stringify({ description }),
     });
   }
 
   return (
     <div>
       <form
-        className="panel p-3 sm:p-5"
+        className="panel p-3 sm:p-4"
         noValidate
         onSubmit={(e) => {
           e.preventDefault();
           submit();
         }}
       >
-        <p className="px-1 text-sm font-bold">Fill in anything you remember. One or two details is enough to start.</p>
-        <div className="mt-4 grid gap-4 sm:grid-cols-2">
-          {FIELDS.filter((f) => showExtra || !f.extra || clues[f.key]).map((f) => (
-            <label key={f.key} className={`text-sm font-medium text-muted ${f.long ? "sm:col-span-2" : ""}`}>
-              {f.label}
-              {f.long ? (
-                <textarea
-                  name={f.key}
-                  autoComplete="off"
-                  rows={2}
-                  maxLength={400}
-                  className={`${inputClass} resize-y`}
-                  placeholder={f.placeholder}
-                  value={clues[f.key] ?? ""}
-                  onChange={(e) => { const v = e.target.value; setClues((c) => ({ ...c, [f.key]: v })); }}
-                />
-              ) : (
-                <input
-                  name={f.key}
-                  type="text"
-                  autoComplete="off"
-                  maxLength={200}
-                  className={`${inputClass} h-12`}
-                  placeholder={f.placeholder}
-                  value={clues[f.key] ?? ""}
-                  onChange={(e) => { const v = e.target.value; setClues((c) => ({ ...c, [f.key]: v })); }}
-                />
-              )}
-            </label>
-          ))}
-        </div>
-        {!showExtra && (
-          <button
-            type="button"
-            onClick={() => setShowExtra(true)}
-            className="mt-3 inline-flex min-h-10 items-center gap-1.5 px-1 text-sm font-bold text-sky hover:text-text"
-          >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" aria-hidden="true">
-              <path d="M12 5v14M5 12h14" />
-            </svg>
-            Add setting, time period, art style or when you watched it
-          </button>
-        )}
+        <label htmlFor="forgot-input" className="block px-1 text-sm font-bold">
+          Describe anything you remember about the show
+        </label>
+        <textarea
+          ref={inputRef}
+          id="forgot-input"
+          name="description"
+          aria-invalid={formError ? true : undefined}
+          aria-describedby={formError ? "forgot-error" : undefined}
+          rows={2}
+          maxLength={600}
+          autoComplete="off"
+          enterKeyHint="search"
+          value={text}
+          onChange={(e) => { setText(e.target.value); if (formError) setFormError(""); }}
+          onKeyDown={(e) => {
+            // Enter searches; Shift+Enter makes a new line.
+            if (e.key === "Enter" && !e.shiftKey) {
+              e.preventDefault();
+              submit();
+            }
+          }}
+          placeholder="A girl with pink hair and a huge sword fights demons to save her brother…"
+          className="mt-1 block w-full resize-none bg-transparent px-1 py-2 text-lg leading-snug text-text placeholder:text-muted focus:outline-none sm:text-xl"
+        />
         {formError && (
-          <p role="alert" className="mt-4 px-1 text-sm font-medium text-danger">
+          <p id="forgot-error" role="alert" className="px-1 pb-2 text-sm font-medium text-danger">
             {formError}
           </p>
         )}
-        <div className="mt-4 flex flex-wrap items-center gap-3">
+        <div className="flex items-center justify-between gap-3 border-t border-line pt-3">
+          <span className="px-1 text-xs tabular-nums text-muted" aria-hidden="true">
+            {text.length}/600
+          </span>
           <button
             type="submit"
             disabled={state.status === "loading"}
@@ -113,11 +78,6 @@ export function ForgotTab() {
           >
             {state.status === "loading" ? "Searching…" : "Find the show"}
           </button>
-          {filled > 0 && (
-            <button type="button" onClick={() => setClues(EMPTY)} className="min-h-10 px-1 text-sm text-sky underline underline-offset-4 hover:text-text">
-              Clear form
-            </button>
-          )}
         </div>
       </form>
 
